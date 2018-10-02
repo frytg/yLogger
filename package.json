@@ -1,5 +1,5 @@
 {
-  "name": "yLogger",
+  "name": "ylogger",
   "version": "0.9.0",
   "description": "Making centralized logging easier for microservices architectures",
   "main": "index.js",
@@ -9,7 +9,7 @@
   },
   "homepage": "https://github.com/frytg/yLogger/blob/master/README.md",
 
-  "author": "Daniel Freytag <daniel@frytg.com>",
+  "author": "Daniel Freytag <help@frytg.com>",
   "license": "MIT",
   "dependencies": {
 	"@google-cloud/logging": "4.0.1",
