@@ -13,7 +13,7 @@ const 	os 		= 	require('os');
 
 var 	logAgent;
 var 	errorAgent;
-var 	sessionOptions;
+var 	yLoggerSessionOptions;
 
 
 // Helpers
@@ -26,11 +26,11 @@ const helpers = {
 		return str.toLowerCase();
 	},
 
-	upperCase = function(str){
+	upperCase: function(str){
 	return str.toUpperCase();
 	},
 
-	camelCase = function(str){
+	camelCase: function(str){
 		str = helpers.removeNonWord(str)
 			.replace(/\-/g, ' ') //convert all hyphens to spaces
 			.replace(/\s[a-z]/g, helpers.upperCase) //convert first char of each word to UPPERCASE
@@ -41,26 +41,23 @@ const helpers = {
 };
 
 
-helpers.
+const externalLogging = {
+	yPush: function(url, token, text) {
+	    var options = {
+	      uri: url,
+	      method: 'POST',
+	      json: {
+			  'text': text,
+			  'token': token
+		  }
+	    };
 
-helpers.
-
-
-function sendDevBot(url, token, text) {
-    var options = {
-      uri: url,
-      method: 'POST',
-      json: {
-		  'text': text,
-		  'token': token
-	  }
-    };
-
-    request(options, function (error, response, body) {
-    	if (!error && response.statusCode != 200) { console.error(error); } else {
-    	    console.log("sendDevBot: " + text);
-    	}
-    });
+	    request(options, function (error, response, body) {
+	    	if (!error && response.statusCode != 200) { console.error(error); } else {
+	    	    console.log("yPush: " + text);
+	    	}
+	    });
+	}
 }
 
 function yLogger(options) {
@@ -68,44 +65,44 @@ function yLogger(options) {
 	 * projectID
 	 * keyFilename
 	 * serviceName
-	 *
 	*/
 
 	const {Logging} = require('@google-cloud/logging');
 	const logging = new Logging({
-		projectId: options.projectID,
-		keyFilename: options.keyFilename
+		projectId: options.loggingProjectID,
+		keyFilename: options.loggingKeyFilename
 	});
 	logAgent = logging.log(options.serviceName);
 
 	// Load Google Cloud Error Reporting
 	const ErrorReporting = require('@google-cloud/error-reporting').ErrorReporting;
 	errorAgent = new ErrorReporting({
-		projectId: options.projectID,
-		keyFilename: options.keyFilename,
+		projectId: options.loggingProjectID,
+		keyFilename: options.loggingKeyFilename,
 		ignoreEnvironmentCheck: true
 	});
 
-	sessionOptions = options;
+	yLoggerSessionOptions = options;
 
 }
 
-yLogger.prototype.log = function (level, label, text, data) {
+yLogger.prototype.log = function (level, func, text, data) {
 	/*
 	 *	Level:	debug / info / warning / error / critical
-	 *	Label:	sys / function
+	 *	func:	sys / function-name
 	 *	Text:	String
-	 *	Data:	Debugging
+	 *	Data:	Object
 	 */
 
 	var payload = {
-		message: this.serviceName + ":" + label + "/ " + text,
+		message: yLoggerSessionOptions.serviceName + ": " + func + "/ " + text,
 		serviceContext: {
-			serviceName: this.serviceName,
-			label: label
+			serviceName: yLoggerSessionOptions.serviceName,
+			serviceStage: yLoggerSessionOptions.serviceStage,
+			function: func,
+			host: os.hostname()
 		},
-		data: data,
-		task: label
+		data: data
 	};
 	const entry = logAgent.entry({resource: {type: "global", labels: {device: __dirname } } }, payload);
 
@@ -116,10 +113,16 @@ yLogger.prototype.log = function (level, label, text, data) {
 	} else if (level == "debug") { 		logAgent.debug(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
 	} else { 							logAgent.write(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); }); }
 
-	if(label == 'sys' && sessionOptions.yPushInUse) { sendDevBot(sessionOptions.yPushUrl, sessionOptions.yPushToken, '*' + this.serviceName + "*: " + text); }
+
+	// Push to yLogger if enabled
+	if(func == 'sys' && yLoggerSessionOptions.yPushInUse) {
+		console.log('sending to yPush');
+		externalLogging.yPush(yLoggerSessionOptions.yPushUrl, yLoggerSessionOptions.yPushToken, '*' + yLoggerSessionOptions.serviceName + "*: " + text);
+	}
+
 
 	if(level == "critical" || level == "error") {
-
+		// Format message for Error Reporting
 		var message = "";
 		for(key in data) {
 			if(typeof (data[key]) == "object") {
@@ -131,13 +134,14 @@ yLogger.prototype.log = function (level, label, text, data) {
 			} else { message += "at " + key + "(" + data[key] + ")\n"; }
 		}
 
+		// Build Event and push to Error Reporting
 		const errorEvent = errorAgent.event();
-		errorEvent.setServiceContext(os.hostname() + "-" + label, this.serviceStage);
-		errorEvent.setMessage(helpers.camelCase(os.hostname() + " " + label + " " + text) + ": " + text + "\n" + message);
+		errorEvent.setServiceContext(yLoggerSessionOptions.serviceName + ":" + func + " @" + os.hostname(), yLoggerSessionOptions.serviceStage);
+		errorEvent.setMessage(yLoggerSessionOptions.serviceName + " -> " + func + " -> " + text + "\n" + message);
 		errorEvent.setUser(level + "@" + os.hostname()) + "-" + this.serviceStage;
-		errorEvent.setFunctionName(label + "/" + helpers.camelCase(text));
+		errorEvent.setFunctionName(func + "/" + helpers.camelCase(text));
 		errorAgent.report(errorEvent, () => {
-		  console.log('Opened new Issue in Google Cloud Error Reporting!');
+		  console.log('Pushed new Issue to Google Cloud Error Reporting!');
 		});
 	}
 };
