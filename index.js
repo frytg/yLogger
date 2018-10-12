@@ -116,7 +116,6 @@ yLogger.prototype.log = function (level, func, text, data) {
 
 	// Push to yLogger if enabled
 	if(func == 'sys' && yLoggerSessionOptions.yPushInUse) {
-		console.log('sending to yPush');
 		externalLogging.yPush(yLoggerSessionOptions.yPushUrl, yLoggerSessionOptions.yPushToken, '*' + yLoggerSessionOptions.serviceName + "*: " + text);
 	}
 
