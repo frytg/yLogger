@@ -28,7 +28,7 @@ Forget manual configurations to catch your logging entries for GCP Logging. Copy
 - Make sure that the path for loggingKeyFilename is correct, this often causes trouble
 - Now import the library and config to your code:
    ```
-   const yLoggerConfig 		= require('./yLoggerConfig');
+   const yLoggerConfig 			= require('./yLoggerConfig');
    const logger 				= new yLogger(yLoggerConfig).log;
    ```
 - To create a log entry, simple call
