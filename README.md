@@ -13,18 +13,18 @@ Forget manual configurations to catch your logging entries for GCP Logging. Copy
 ## INSTALL
 - Add package to your project `npm i ylogger --save`
 - Create a _yLoggerCongig.js_ from this template:
-```
-module.exports = {
-	"yPushInUse": 			true,
-	"yPushUrl": 			"YOUR_HTTPS_URL",
-	"yPushToken": 			"YOUR_TOKEN",
+   ```
+   module.exports = {
+   	"yPushInUse": 			true,
+   	"yPushUrl": 			"YOUR_HTTPS_URL",
+   	"yPushToken": 			"YOUR_TOKEN",
 
-	"loggingProjectID":		"YOUR_PROJECT_FOR_GCP_LOGGING",
-	"loggingKeyFilename": 	"./keys/YOUR_IAM_KEY_FOR_GCP_LOGGING",
-	"serviceName": 			"YOUR_MICROSERVICE_NAME",
-	"serviceStage":			"YOUR_STAGE"
-};
-```
+   	"loggingProjectID":		"YOUR_PROJECT_FOR_GCP_LOGGING",
+   	"loggingKeyFilename":		"./keys/YOUR_IAM_KEY_FOR_GCP_LOGGING",
+   	"serviceName": 			"YOUR_MICROSERVICE_NAME",
+   	"serviceStage":			"YOUR_STAGE"
+   };
+   ```
 - Make sure that the path for loggingKeyFilename is correct, this often causes trouble
 - Now import the library and config to your code:
    ```
