@@ -8,8 +8,9 @@
 
 */
 
-var 	request = 	require('request');
-const 	os 		= 	require('os');
+var 	request 	= 	require('request');
+const 	os 			= 	require('os');
+const	stringify	=	require('json-stringify-safe');
 
 var 	logAgent;
 var 	errorAgent;
@@ -127,7 +128,7 @@ yLogger.prototype.log = function (level, func, text, data) {
 			if(typeof (data[key]) == "object") {
 
 				if(typeof (data[key]) == "object") {
-					for(key2 in data[key]) { message += "at " + key + "." + key2 + "(" + JSON.stringify(data[key][key2]) + ")\n"; }
+					for(key2 in data[key]) { message += "at " + key + "." + key2 + "(" + stringify(data[key][key2]) + ")\n"; }
 				} else { message += "at " + key + "(" + data[key] + ")\n"; }
 
 			} else { message += "at " + key + "(" + data[key] + ")\n"; }
