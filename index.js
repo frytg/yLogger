@@ -96,7 +96,7 @@ yLogger.prototype.log = function (level, func, text, data) {
 	 */
 
 	var payload = {
-		message: yLoggerSessionOptions.serviceName + ": " + func + "/ " + text,
+		message: text,
 		serviceContext: {
 			serviceName: yLoggerSessionOptions.serviceName,
 			serviceStage: yLoggerSessionOptions.serviceStage,
