@@ -43,106 +43,120 @@ const helpers = {
 
 
 const externalLogging = {
-	yPush: function(url, token, text) {
-	    var options = {
-	      uri: url,
-	      method: 'POST',
-	      json: {
-			  'text': text,
-			  'token': token
-		  }
-	    };
+		yPush: function(url, token, text) {
+			try {
+			    var options = {
+			      uri: url,
+			      method: 'POST',
+			      json: {
+					  'text': text,
+					  'token': token
+				  }
+			    };
 
-	    request(options, function (error, response, body) {
-	    	if (!error && response.statusCode != 200) { console.error(error); } else {
-	    	    console.log("yPush: " + text);
-	    	}
-	    });
-	}
+			    request(options, function (error, response, body) {
+			    	if (!error && response.statusCode != 200) { console.error(error); } else {
+			    	    console.log("yPush: " + text);
+			    	}
+			    });
+			} catch (err) {
+				console.error('externalLogging.yPush');
+				console.error({err});
+			}
+		}
 }
 
 function yLogger(options) {
-	/*
-	 * projectID
-	 * keyFilename
-	 * serviceName
-	*/
+	try {
+		/*
+		 * projectID
+		 * keyFilename
+		 * serviceName
+		*/
 
-	const {Logging} = require('@google-cloud/logging');
-	const logging = new Logging({
-		projectId: options.loggingProjectID,
-		keyFilename: options.loggingKeyFilename
-	});
-	logAgent = logging.log(options.serviceName);
+		const {Logging} = require('@google-cloud/logging');
+		const logging = new Logging({
+			projectId: options.loggingProjectID,
+			keyFilename: options.loggingKeyFilename
+		});
+		logAgent = logging.log(options.serviceName);
 
-	// Load Google Cloud Error Reporting
-	const ErrorReporting = require('@google-cloud/error-reporting').ErrorReporting;
-	errorAgent = new ErrorReporting({
-		projectId: options.loggingProjectID,
-		keyFilename: options.loggingKeyFilename,
-		ignoreEnvironmentCheck: true
-	});
+		// Load Google Cloud Error Reporting
+		const ErrorReporting = require('@google-cloud/error-reporting').ErrorReporting;
+		errorAgent = new ErrorReporting({
+			projectId: options.loggingProjectID,
+			keyFilename: options.loggingKeyFilename,
+			ignoreEnvironmentCheck: true
+		});
 
-	yLoggerSessionOptions = options;
-
+		yLoggerSessionOptions = options;
+	} catch (err) {
+		console.error('yLogger');
+		console.error({err});
+	}
 }
 
 yLogger.prototype.log = function (level, func, text, data) {
-	/*
-	 *	Level:	debug / info / warning / error / critical
-	 *	func:	sys / function-name
-	 *	Text:	String
-	 *	Data:	Object
-	 */
+	try {
+		/*
+		 *	Level:	debug / info / warning / error / critical
+		 *	func:	sys / function-name
+		 *	Text:	String
+		 *	Data:	Object
+		 */
 
-	var payload = {
-		message: text,
-		serviceContext: {
-			serviceName: yLoggerSessionOptions.serviceName,
-			serviceStage: yLoggerSessionOptions.serviceStage,
-			function: func,
-			host: os.hostname()
-		},
-		data: data
-	};
-	const entry = logAgent.entry({resource: {type: "global", labels: {device: __dirname } } }, payload);
+		var payload = {
+			message: text,
+			serviceContext: {
+				serviceName: yLoggerSessionOptions.serviceName,
+				serviceStage: yLoggerSessionOptions.serviceStage,
+				function: func,
+				host: os.hostname()
+			},
+			data: data
+		};
+		const entry = logAgent.entry({resource: {type: "global", labels: {device: __dirname } } }, payload);
 
-	if(level == "error") { 				logAgent.error(entry).then(() => { 		console.error(`Logged: ${text}`); }).catch(err => { 	console.error('ERROR:', err); });
-	} else if (level == "info") { 		logAgent.info(entry).then(() => { 		console.info(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-	} else if (level == "critical") { 	logAgent.critical(entry).then(() => { 	console.critical(`Logged: ${text}`); }).catch(err => { 	console.error('ERROR:', err); });
-	} else if (level == "warning") { 	logAgent.warning(entry).then(() => { 	console.warn(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-	} else if (level == "debug") { 		logAgent.debug(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-	} else { 							logAgent.write(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); }); }
-
-
-	// Push to yLogger if enabled
-	if(func == 'sys' && yLoggerSessionOptions.yPushInUse) {
-		externalLogging.yPush(yLoggerSessionOptions.yPushUrl, yLoggerSessionOptions.yPushToken, '*' + yLoggerSessionOptions.serviceName + "*: " + text);
-	}
+		if(level == "error") { 				logAgent.error(entry).then(() => { 		console.error(`Logged: ${text}`); }).catch(err => { 	console.error('ERROR:', err); });
+		} else if (level == "info") { 		logAgent.info(entry).then(() => { 		console.info(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+		} else if (level == "critical") { 	logAgent.critical(entry).then(() => { 	console.critical(`Logged: ${text}`); }).catch(err => { 	console.error('ERROR:', err); });
+		} else if (level == "warning") { 	logAgent.warning(entry).then(() => { 	console.warn(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+		} else if (level == "debug") { 		logAgent.debug(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+		} else { 							logAgent.write(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); }); }
 
 
-	if(level == "critical" || level == "error") {
-		// Format message for Error Reporting
-		var message = "";
-		for(key in data) {
-			if(typeof (data[key]) == "object") {
-
-				if(typeof (data[key]) == "object") {
-					for(key2 in data[key]) { message += "at " + key + "." + key2 + "(" + stringify(data[key][key2]) + ")\n"; }
-				} else { message += "at " + key + "(" + data[key] + ")\n"; }
-
-			} else { message += "at " + key + "(" + data[key] + ")\n"; }
+		// Push to yLogger if enabled
+		if(func == 'sys' && yLoggerSessionOptions.yPushInUse) {
+			externalLogging.yPush(yLoggerSessionOptions.yPushUrl, yLoggerSessionOptions.yPushToken, '*' + yLoggerSessionOptions.serviceName + "*: " + text);
 		}
 
-		// Build Event and push to Error Reporting
-		const errorEvent = errorAgent.event();
-		errorEvent.setServiceContext(yLoggerSessionOptions.serviceName + ":" + func + " @" + os.hostname(), yLoggerSessionOptions.serviceStage);
-		errorEvent.setMessage(yLoggerSessionOptions.serviceName + " -> " + func + " -> " + text + "\n" + message);
-		errorEvent.setUser(level + "@" + os.hostname()) + "-" + this.serviceStage;
-		errorEvent.setFunctionName(func + "/" + helpers.camelCase(text));
-		errorAgent.report(errorEvent, () => {
-		  console.log('Pushed new Issue to Google Cloud Error Reporting!');
-		});
+
+		if(level == "critical" || level == "error") {
+			// Format message for Error Reporting
+			var message = "";
+			for(key in data) {
+				if(typeof (data[key]) == "object") {
+
+					if(typeof (data[key]) == "object") {
+						for(key2 in data[key]) { message += "at " + key + "." + key2 + "(" + stringify(data[key][key2]) + ")\n"; }
+					} else { message += "at " + key + "(" + data[key] + ")\n"; }
+
+				} else { message += "at " + key + "(" + data[key] + ")\n"; }
+			}
+
+			// Build Event and push to Error Reporting
+			const errorEvent = errorAgent.event();
+			errorEvent.setServiceContext(yLoggerSessionOptions.serviceName + ":" + func + " @" + os.hostname(), yLoggerSessionOptions.serviceStage);
+			errorEvent.setMessage(yLoggerSessionOptions.serviceName + " -> " + func + " -> " + text + "\n" + message);
+			errorEvent.setUser(level + "@" + os.hostname()) + "-" + this.serviceStage;
+			errorEvent.setFunctionName(func + "/" + helpers.camelCase(text));
+			errorAgent.report(errorEvent, () => {
+			  console.log('Pushed new Issue to Google Cloud Error Reporting!');
+			});
+		}
+	} catch (err) {
+		console.error('yLogger.prototype.log');
+		console.error({err});
 	}
 };
 
