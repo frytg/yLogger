@@ -1,6 +1,6 @@
 {
   "name": "ylogger",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Making centralized logging easier for microservices architectures",
   "main": "index.js",
   "repository": {
