@@ -117,12 +117,12 @@ yLogger.prototype.log = function (level, func, text, data) {
 		};
 		const entry = logAgent.entry({resource: {type: "global", labels: {device: __dirname } } }, payload);
 
-		if(level == "error") { 				logAgent.error(entry).then(() => { 		console.error(`Logged: ${text}`); }).catch(err => { 	console.error('ERROR:', err); });
+		if(level == "error") { 			logAgent.error(entry).then(() => { 		console.error(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
 		} else if (level == "info") { 		logAgent.info(entry).then(() => { 		console.info(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-		} else if (level == "critical") { 	logAgent.critical(entry).then(() => { 	console.error(`Logged: ${text}`); }).catch(err => { 	console.error('ERROR:', err); });
-		} else if (level == "warning") { 	logAgent.warning(entry).then(() => { 	console.warn(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+		} else if (level == "critical") { 	logAgent.critical(entry).then(() => { 		console.error(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+		} else if (level == "warning") { 	logAgent.warning(entry).then(() => { 		console.warn(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
 		} else if (level == "debug") { 		logAgent.debug(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-		} else { 							logAgent.write(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); }); }
+		} else { 				logAgent.write(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); }); }
 
 
 		// Push to yLogger if enabled
