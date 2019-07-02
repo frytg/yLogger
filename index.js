@@ -8,9 +8,9 @@
 
 */
 
-var 	request 	= 	require('request');
-const 	os 			= 	require('os');
-const	stringify	=	require('json-stringify-safe');
+var 	request 	= require('request');
+const 	os 		= require('os');
+const	stringify	= require('json-stringify-safe');
 
 var 	logAgent;
 var 	errorAgent;
@@ -74,22 +74,25 @@ function yLogger(options) {
 		 * serviceName
 		*/
 
-		const {Logging} = require('@google-cloud/logging');
-		const logging = new Logging({
-			projectId: options.loggingProjectID,
-			keyFilename: options.loggingKeyFilename
+		const {Logging}		= require('@google-cloud/logging');
+		const logging		= new Logging({
+			projectId:		options.loggingProjectID,
+			keyFilename:		options.loggingKeyFilename
 		});
 		logAgent = logging.log(options.serviceName);
 
+
 		// Load Google Cloud Error Reporting
-		const ErrorReporting = require('@google-cloud/error-reporting').ErrorReporting;
-		errorAgent = new ErrorReporting({
-			projectId: options.loggingProjectID,
-			keyFilename: options.loggingKeyFilename,
-			ignoreEnvironmentCheck: true
+		const {ErrorReporting}	= require('@google-cloud/error-reporting');
+		errorAgent 		= new ErrorReporting({
+			projectId:		options.loggingProjectID,
+			keyFilename:		options.loggingKeyFilename,
+			ignoreEnvironmentCheck:	true
 		});
 
+
 		yLoggerSessionOptions = options;
+		
 	} catch (err) {
 		console.error('yLogger');
 		console.error({err});
