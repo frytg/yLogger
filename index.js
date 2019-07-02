@@ -87,12 +87,12 @@ function yLogger(options) {
 		errorAgent 		= new ErrorReporting({
 			projectId:		options.loggingProjectID,
 			keyFilename:		options.loggingKeyFilename,
-			ignoreEnvironmentCheck:	true
+			reportMode:		'always'
 		});
 
 
 		yLoggerSessionOptions = options;
-		
+
 	} catch (err) {
 		console.error('yLogger');
 		console.error({err});
