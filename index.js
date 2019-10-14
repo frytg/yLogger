@@ -94,8 +94,7 @@ function yLogger(options) {
 		yLoggerSessionOptions = options;
 
 	} catch (err) {
-		console.error('yLogger');
-		console.error({err});
+		console.error('YLOGGER', {err});
 	}
 }
 
