@@ -3,18 +3,18 @@
 	yLogger
 
 	AUTHOR		Daniel Freytag
-				https://twitter.com/FRYTG
-				https://github.com/FRYTG
+			https://twitter.com/FRYTG
+			https://github.com/FRYTG
 
 */
 
-var 	request 	= require('request');
-const 	os 		= require('os');
-const	stringify	= require('json-stringify-safe');
+var 	fetch 		= require('node-fetch')
+const 	os 		= require('os')
+const	stringify	= require('json-stringify-safe')
 
-var 	logAgent;
-var 	errorAgent;
-var 	yLoggerSessionOptions;
+var 	logAgent
+var 	errorAgent
+var 	yLoggerSessionOptions
 
 
 // Helpers
@@ -43,125 +43,119 @@ const helpers = {
 
 
 const externalLogging = {
-		yPush: function(url, token, text) {
-			try {
-			    var options = {
-			      uri: url,
-			      method: 'POST',
-			      json: {
-					  'text': text,
-					  'token': token
-				  }
-			    };
-
-			    request(options, function (error, response, body) {
-			    	if (!error && response.statusCode != 200) { console.error(error); } else {
-			    	    console.log("yPush: " + text);
-			    	}
-			    });
-			} catch (err) {
-				console.error('externalLogging.yPush');
-				console.error({err});
+	yPush: async function(url, token, text) { try {
+		let options = {
+			method: 'POST',
+			body:	JSON.stringify({
+				text:	text,
+				token:	token
+			}),
+			headers:	{ 
+				'User-Agent':	'yLogger/1.7.0'
 			}
 		}
+
+		let post = await fetch(url, options)
+		if(post.status != 200) {
+			let text = post.text()
+			console.error("yPush: " + text)
+		}
+
+	} catch (err) {
+		console.error('externalLogging.yPush', err)
+	} }
 }
 
-function yLogger(options) {
-	try {
-		/*
-		 * projectID
-		 * keyFilename
-		 * serviceName
+function yLogger(options) { try {
+	/*
+		* projectID
+		* keyFilename
+		* serviceName
+	*/
+
+	const {Logging}		= require('@google-cloud/logging')
+	const logging		= new Logging({
+		projectId:		options.loggingProjectID,
+		keyFilename:		options.loggingKeyFilename
+	})
+	logAgent = logging.log(options.serviceName)
+
+
+	// Load Google Cloud Error Reporting
+	const {ErrorReporting}	= require('@google-cloud/error-reporting')
+	errorAgent 		= new ErrorReporting({
+		projectId:		options.loggingProjectID,
+		keyFilename:		options.loggingKeyFilename,
+		reportMode:		'always'
+	})
+
+	yLoggerSessionOptions = options
+
+} catch (err) {
+	console.error('yLogger', err)
+} }
+
+yLogger.prototype.log = function (level, func, text, data) { try {
+	/*
+		*	Level:	debug / info / warning / error / critical
+		*	func:	sys / function-name
+		*	Text:	String
+		*	Data:	Object
 		*/
 
-		const {Logging}		= require('@google-cloud/logging');
-		const logging		= new Logging({
-			projectId:		options.loggingProjectID,
-			keyFilename:		options.loggingKeyFilename
-		});
-		logAgent = logging.log(options.serviceName);
+	var payload = {
+		message: text,
+		serviceContext: {
+			serviceName: yLoggerSessionOptions.serviceName,
+			serviceStage: yLoggerSessionOptions.serviceStage,
+			function: func,
+			host: os.hostname()
+		},
+		data: data
+	};
+	const entry = logAgent.entry({resource: {type: "global", labels: {device: __dirname } } }, payload);
+
+	if(level == "error") { 			logAgent.error(entry).then(() => { 		console.error(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+	} else if (level == "info") { 		logAgent.info(entry).then(() => { 		console.info(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+	} else if (level == "critical") { 	logAgent.critical(entry).then(() => { 		console.error(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+	} else if (level == "warning") { 	logAgent.warning(entry).then(() => { 		console.warn(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+	} else if (level == "debug") { 		logAgent.debug(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
+	} else { 				logAgent.write(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); }); }
 
 
-		// Load Google Cloud Error Reporting
-		const {ErrorReporting}	= require('@google-cloud/error-reporting');
-		errorAgent 		= new ErrorReporting({
-			projectId:		options.loggingProjectID,
-			keyFilename:		options.loggingKeyFilename,
-			reportMode:		'always'
-		});
-
-
-		yLoggerSessionOptions = options;
-
-	} catch (err) {
-		console.error('YLOGGER', {err});
+	// Push to yLogger if enabled
+	if(func == 'sys' && yLoggerSessionOptions.yPushInUse) {
+		externalLogging.yPush(yLoggerSessionOptions.yPushUrl, yLoggerSessionOptions.yPushToken, '*' + yLoggerSessionOptions.serviceName + "*: " + text);
 	}
-}
-
-yLogger.prototype.log = function (level, func, text, data) {
-	try {
-		/*
-		 *	Level:	debug / info / warning / error / critical
-		 *	func:	sys / function-name
-		 *	Text:	String
-		 *	Data:	Object
-		 */
-
-		var payload = {
-			message: text,
-			serviceContext: {
-				serviceName: yLoggerSessionOptions.serviceName,
-				serviceStage: yLoggerSessionOptions.serviceStage,
-				function: func,
-				host: os.hostname()
-			},
-			data: data
-		};
-		const entry = logAgent.entry({resource: {type: "global", labels: {device: __dirname } } }, payload);
-
-		if(level == "error") { 			logAgent.error(entry).then(() => { 		console.error(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-		} else if (level == "info") { 		logAgent.info(entry).then(() => { 		console.info(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-		} else if (level == "critical") { 	logAgent.critical(entry).then(() => { 		console.error(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-		} else if (level == "warning") { 	logAgent.warning(entry).then(() => { 		console.warn(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-		} else if (level == "debug") { 		logAgent.debug(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); });
-		} else { 				logAgent.write(entry).then(() => { 		console.log(`Logged: ${text}`); }).catch(err => { 		console.error('ERROR:', err); }); }
 
 
-		// Push to yLogger if enabled
-		if(func == 'sys' && yLoggerSessionOptions.yPushInUse) {
-			externalLogging.yPush(yLoggerSessionOptions.yPushUrl, yLoggerSessionOptions.yPushToken, '*' + yLoggerSessionOptions.serviceName + "*: " + text);
-		}
+	if(level == "critical" || level == "error") {
+		// Format message for Error Reporting
+		var message = "";
+		for(key in data) {
+			if(typeof (data[key]) == "object") {
 
-
-		if(level == "critical" || level == "error") {
-			// Format message for Error Reporting
-			var message = "";
-			for(key in data) {
 				if(typeof (data[key]) == "object") {
-
-					if(typeof (data[key]) == "object") {
-						for(key2 in data[key]) { message += "at " + key + "." + key2 + "(" + stringify(data[key][key2]) + ")\n"; }
-					} else { message += "at " + key + "(" + data[key] + ")\n"; }
-
+					for(key2 in data[key]) { message += "at " + key + "." + key2 + "(" + stringify(data[key][key2]) + ")\n"; }
 				} else { message += "at " + key + "(" + data[key] + ")\n"; }
-			}
 
-			// Build Event and push to Error Reporting
-			const errorEvent = errorAgent.event();
-			errorEvent.setServiceContext(yLoggerSessionOptions.serviceName + ":" + func + " @" + os.hostname(), yLoggerSessionOptions.serviceStage);
-			errorEvent.setMessage(yLoggerSessionOptions.serviceName + " -> " + func + " -> " + text + "\n" + message);
-			errorEvent.setUser(level + "@" + os.hostname()) + "-" + this.serviceStage;
-			errorEvent.setFunctionName(func + "/" + helpers.camelCase(text));
-			errorAgent.report(errorEvent, () => {
-			  console.log('Pushed new Issue to Google Cloud Error Reporting!');
-			});
+			} else { message += "at " + key + "(" + data[key] + ")\n"; }
 		}
-	} catch (err) {
-		console.error('yLogger.prototype.log');
-		console.error({err});
+
+		// Build Event and push to Error Reporting
+		const errorEvent = errorAgent.event();
+		errorEvent.setServiceContext(yLoggerSessionOptions.serviceName + ":" + func + " @" + os.hostname(), yLoggerSessionOptions.serviceStage);
+		errorEvent.setMessage(yLoggerSessionOptions.serviceName + " -> " + func + " -> " + text + "\n" + message);
+		errorEvent.setUser(level + "@" + os.hostname()) + "-" + this.serviceStage;
+		errorEvent.setFunctionName(func + "/" + helpers.camelCase(text));
+		errorAgent.report(errorEvent, () => {
+			console.log('Pushed new Issue to Google Cloud Error Reporting!');
+		});
 	}
-};
+} catch (err) {
+	console.error('yLogger.prototype.log', err)
+} }
 
 
 
-module.exports = yLogger;
+module.exports = yLogger

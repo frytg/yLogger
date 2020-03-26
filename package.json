@@ -1,6 +1,6 @@
 {
 	"name": "ylogger",
-	"version": "1.6.0",
+	"version": "1.7.0",
 	"description": "Making centralized logging easier for microservices architectures",
 	"main": "index.js",
 	"repository": {
@@ -12,11 +12,10 @@
 	"author": "Daniel Freytag <help@frytg.com>",
 	"license": "MIT",
 	"dependencies": {
-		"@google-cloud/logging": "5.4.1",
-		"@google-cloud/error-reporting": "1.1.2",
-		"@grpc/grpc-js": "0.6.8",
+		"@google-cloud/logging": "7.3.0",
+		"@google-cloud/error-reporting": "1.1.3",
 		"os": "0.1.1",
-		"request": "2.88.0",
+		"node-fetch": "2.6.0",
 		"json-stringify-safe": "5.0.1"
 	}
 }
