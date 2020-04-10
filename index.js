@@ -51,6 +51,7 @@ const externalLogging = {
 				token:	token
 			}),
 			headers:	{ 
+				'Content-Type':	'application/json',
 				'User-Agent':	'yLogger/1.7.0'
 			}
 		}
