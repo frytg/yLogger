@@ -44,6 +44,7 @@ const helpers = {
 
 const externalLogging = {
 	yPush: async function(url, token, text) { try {
+		// build options
 		let options = {
 			method: 'POST',
 			body:	JSON.stringify({
@@ -56,14 +57,24 @@ const externalLogging = {
 			}
 		}
 
+
+		// send request
 		let post = await fetch(url, options)
+		
+		
+		// handle errors
 		if(post.status != 200) {
-			let text = post.text()
-			console.error("yPush: " + text)
+			let text = await post.text()
+			console.error('yPush > ' + text)
 		}
+
+
+		// close promise
+		return Promise.resolve()
 
 	} catch (err) {
 		console.error('externalLogging.yPush', err)
+		return Promise.reject(err)
 	} }
 }
 
@@ -126,7 +137,7 @@ yLogger.prototype.log = function (level, func, text, data) { try {
 
 	// Push to yLogger if enabled
 	if(func == 'sys' && yLoggerSessionOptions.yPushInUse) {
-		externalLogging.yPush(yLoggerSessionOptions.yPushUrl, yLoggerSessionOptions.yPushToken, '*' + yLoggerSessionOptions.serviceName + "*: " + text);
+		await externalLogging.yPush(yLoggerSessionOptions.yPushUrl, yLoggerSessionOptions.yPushToken, '*' + yLoggerSessionOptions.serviceName + "*: " + text);
 	}
 
 
