@@ -1,6 +1,6 @@
 {
 	"name": "ylogger",
-	"version": "1.7.2",
+	"version": "1.7.3",
 	"description": "Making centralized logging easier for microservices architectures",
 	"main": "index.js",
 	"repository": {
@@ -13,7 +13,7 @@
 	"homepage": "https://github.com/frytg/yLogger/",
 
 	"author": "Daniel Freytag <help@frytg.com>",
-	"license": "MIT",
+	"license": "Hippocratic License",
 	"dependencies": {
 		"@google-cloud/logging": "7.3.0",
 		"@google-cloud/error-reporting": "1.1.3",
