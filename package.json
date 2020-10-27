@@ -1,6 +1,6 @@
 {
 	"name": "ylogger",
-	"version": "2.0.0",
+	"version": "2.1.0",
 	"description": "Making centralized logging easier for microservices architectures",
 	"main": "index.js",
 	"scripts": {
@@ -16,16 +16,16 @@
 	},
 	"homepage": "https://github.com/frytg/yLogger/",
 	"author": "Daniel Freytag <help@frytg.com>",
-	"license": "Hippocratic License",
+	"license": "MIT",
 	"dependencies": {
-		"@google-cloud/logging": "8.0.5",
+		"@google-cloud/logging": "8.0.8",
 		"@google-cloud/error-reporting": "2.0.0",
 		"os": "0.1.1",
 		"node-fetch": "2.6.1",
 		"json-stringify-safe": "5.0.1"
 	},
 	"devDependencies": {
-		"@swrlab/swr-prettier-config": "^0.0.2"
+		"@swrlab/swr-prettier-config": "0.0.2"
 	},
 	"prettier": "@swrlab/swr-prettier-config"
 }

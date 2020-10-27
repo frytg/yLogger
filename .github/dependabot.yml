@@ -2,9 +2,6 @@ version: 2
 updates:
 - package-ecosystem: npm
   directory: "/"
-  open-pull-requests-limit: 10
   schedule:
     interval: daily
     time: '10:00'
-  assignees:
-  - frytg
