@@ -1,6 +1,6 @@
 {
 	"name": "ylogger",
-	"version": "2.1.7",
+	"version": "2.1.8",
 	"description": "Making centralized logging easier for microservices architectures",
 	"main": "index.js",
 	"scripts": {
@@ -9,7 +9,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/frytg/yLogger.git"
+		"url": "git://github.com/frytg/yLogger.git"
 	},
 	"engines": {
 		"node": ">=10.0"
