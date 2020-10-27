@@ -9,16 +9,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 👀 Checkout repo
-      uses: actions/checkout@v2.3.2
+      uses: actions/checkout@v2.3.3
     - name: 🛠 Setup Node
-      uses: actions/setup-node@v2.1.1
+      uses: actions/setup-node@v2.1.2
       with:
+        always-auth: true
         node-version: '12.x'
         registry-url: 'https://npm.pkg.github.com'
-        scope: 'frytg'
+      env:
+        NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: 📦 Install Dependencies
       run: yarn
-    - name: 🚀 npm publish
+    - name: 🚀 Github publish
       run: yarn publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -27,15 +29,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 👀 Checkout repo
-      uses: actions/checkout@v2.3.2
+      uses: actions/checkout@v2.3.3
     - name: 🛠 Setup Node
-      uses: actions/setup-node@v2.1.1
+      uses: actions/setup-node@v2.1.2
       with:
         node-version: '12.x'
         registry-url: 'https://registry.npmjs.org'
     - name: 📦 Install Dependencies
       run: yarn
-    - name: 🚀 Github publish
+    - name: 🚀 npm publish
       run: yarn publish
       env:
         NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
