@@ -1,6 +1,6 @@
 {
 	"name": "ylogger",
-	"version": "2.1.8",
+	"version": "2.1.9",
 	"description": "Making centralized logging easier for microservices architectures",
 	"main": "index.js",
 	"scripts": {
@@ -9,15 +9,12 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git://github.com/frytg/yLogger.git"
+		"url": "git://github.com/frytg/ylogger.git"
 	},
 	"engines": {
 		"node": ">=10.0"
 	},
-	"publishConfig": {
-		"registry": "https://npm.pkg.github.com"
-	},
-	"homepage": "https://github.com/frytg/yLogger/",
+	"homepage": "https://github.com/frytg/ylogger/",
 	"author": "Daniel Freytag <help@frytg.com>",
 	"license": "MIT",
 	"dependencies": {
