@@ -18,7 +18,7 @@
 	"author": "Daniel Freytag <help@frytg.com>",
 	"license": "MIT",
 	"dependencies": {
-		"@google-cloud/logging": "8.0.8",
+		"@google-cloud/logging": "8.1.1",
 		"@google-cloud/error-reporting": "2.0.0",
 		"os": "0.1.1",
 		"node-fetch": "2.6.1",
