@@ -19,7 +19,7 @@
 	"license": "MIT",
 	"dependencies": {
 		"@google-cloud/logging": "8.0.8",
-		"@google-cloud/error-reporting": "2.0.0",
+		"@google-cloud/error-reporting": "2.0.1",
 		"os": "0.1.1",
 		"node-fetch": "2.6.1",
 		"json-stringify-safe": "5.0.1"
