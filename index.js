@@ -119,7 +119,7 @@ function yLogger(options) {
 	}
 }
 
-yLogger.prototype.log = async function (level, func, text, data, logPrefix) {
+yLogger.prototype.log = async function (level, func, text, data, logPrefix = '') {
 	try {
 		/*
 		 *	Level:	debug / info / warning / error / critical
