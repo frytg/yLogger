@@ -119,7 +119,7 @@ function yLogger(options) {
 	}
 }
 
-yLogger.prototype.log = async function (level, func, text, data) {
+yLogger.prototype.log = async function (level, func, text, data, logPrefix) {
 	try {
 		/*
 		 *	Level:	debug / info / warning / error / critical
@@ -155,28 +155,38 @@ yLogger.prototype.log = async function (level, func, text, data) {
 
 		if (level == 'error') {
 			await logAgent.error(entry);
-			yLoggerSessionOptions.silent ? console.error(`Logged: ${text}`) : null;
-			yLoggerSessionOptions.verbose ? console.error(text, JSON.stringify(data)) : null;
+			yLoggerSessionOptions.silent ? console.error(logPrefix, func, `Logged: ${text}`) : null;
+			yLoggerSessionOptions.verbose
+				? console.error(logPrefix, func, text, JSON.stringify(data))
+				: null;
 		} else if (level == 'info') {
 			await logAgent.info(entry);
-			yLoggerSessionOptions.silent ? console.info(`Logged: ${text}`) : null;
-			yLoggerSessionOptions.verbose ? console.info(text, JSON.stringify(data)) : null;
+			yLoggerSessionOptions.silent ? console.info(logPrefix, func, `Logged: ${text}`) : null;
+			yLoggerSessionOptions.verbose
+				? console.info(logPrefix, func, text, JSON.stringify(data))
+				: null;
 		} else if (level == 'critical') {
 			await logAgent.critical(entry);
-			yLoggerSessionOptions.silent ? console.error(`Logged: ${text}`) : null;
-			yLoggerSessionOptions.verbose ? console.error(text, JSON.stringify(data)) : null;
+			yLoggerSessionOptions.silent ? console.error(logPrefix, func, `Logged: ${text}`) : null;
+			yLoggerSessionOptions.verbose
+				? console.error(logPrefix, func, text, JSON.stringify(data))
+				: null;
 		} else if (level == 'warning') {
 			await logAgent.warning(entry);
-			yLoggerSessionOptions.silent ? console.warn(`Logged: ${text}`) : null;
-			yLoggerSessionOptions.verbose ? console.warn(text, JSON.stringify(data)) : null;
+			yLoggerSessionOptions.silent ? console.warn(logPrefix, func, `Logged: ${text}`) : null;
+			yLoggerSessionOptions.verbose
+				? console.warn(logPrefix, func, text, JSON.stringify(data))
+				: null;
 		} else if (level == 'debug') {
 			await logAgent.debug(entry);
-			yLoggerSessionOptions.silent ? console.debug(`Logged: ${text}`) : null;
-			yLoggerSessionOptions.verbose ? console.debug(text, JSON.stringify(data)) : null;
+			yLoggerSessionOptions.silent ? console.debug(logPrefix, func, `Logged: ${text}`) : null;
+			yLoggerSessionOptions.verbose
+				? console.debug(logPrefix, func, text, JSON.stringify(data))
+				: null;
 		} else {
 			await logAgent.write(entry);
 			yLoggerSessionOptions.silent ? console.log(`Logged: ${text}`) : null;
-			yLoggerSessionOptions.verbose ? console.log(text, JSON.stringify(data)) : null;
+			yLoggerSessionOptions.verbose ? console.log(logPrefix, func, text, JSON.stringify(data)) : null;
 		}
 
 		// Push to yLogger if enabled
