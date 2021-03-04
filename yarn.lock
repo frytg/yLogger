@@ -27,10 +27,10 @@
     is "^3.3.0"
     lodash.has "^4.5.2"
 
-"@google-cloud/logging@9.0.2":
-  version "9.0.2"
-  resolved "https://registry.yarnpkg.com/@google-cloud/logging/-/logging-9.0.2.tgz#be1dcd2e1e6264fcb6f83d03e24c905cb7cb9dec"
-  integrity sha512-Okj4mGcHGFpqIkmIKe7f+anAIlB+yqZsXlgafYyv8vFmsOttB1D2v0UMq0xFNS6LX0BvkAlPa31d41XoiXR+uQ==
+"@google-cloud/logging@9.1.0":
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/@google-cloud/logging/-/logging-9.1.0.tgz#45c4ffb07863f7dfacf621c1c88e0049b34af432"
+  integrity sha512-KCl1JK9fbrhxHiEc7VkbhYJP94LHsoa154/EgZuuecXNQ/HNFZtCeXWIdO8wvrSyzQZnI7X2vHn4DlA7sCjRaw==
   dependencies:
     "@google-cloud/common" "^3.4.1"
     "@google-cloud/paginator" "^3.0.0"
@@ -50,7 +50,7 @@
     snakecase-keys "^3.1.2"
     stream-events "^1.0.5"
     through2 "^4.0.0"
-    type-fest "^0.20.0"
+    type-fest "^0.21.0"
 
 "@google-cloud/paginator@^3.0.0":
   version "3.0.5"
@@ -695,10 +695,10 @@ to-space-case@^1.0.0:
   dependencies:
     to-no-case "^1.0.0"
 
-type-fest@^0.20.0:
-  version "0.20.2"
-  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.20.2.tgz#1bf207f4b28f91583666cb5fbd327887301cd5f4"
-  integrity sha512-Ne+eE4r0/iWnpAxD852z3A+N0Bt5RN//NjJwRd2VFHEmrywxf5vsZlh4R6lixl6B+wz/8d+maTSAkN1FIkI3LQ==
+type-fest@^0.21.0:
+  version "0.21.2"
+  resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.21.2.tgz#43b9dc71d9dc5593ea71bf7b0e013ec10f838249"
+  integrity sha512-pvQl0WNazvfQ0rq2XDdhpWv49sohh2t+buFbglaJ9N9+Xj4BhFRpuo+uJxemeARteRxRloJ1m+8gBR6Z2Nfktg==
 
 util-deprecate@^1.0.1:
   version "1.0.2"
