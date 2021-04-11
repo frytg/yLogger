@@ -1,4 +1,4 @@
-# yLogger
+# yLogger - DEPRECATED
 
 Configure logging to GCP Logs within scalable microservices
 
